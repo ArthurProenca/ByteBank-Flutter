@@ -10,7 +10,7 @@ class ByteBankApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-        body: FormularioTransferencia(),
+        body: ListaTransferencia(),
       ),
     );
   }
@@ -28,28 +28,31 @@ class FormularioTransferencia extends StatelessWidget {
         ),
         body: Column(
           children: <Widget>[
-            Editor(controlador: _controllerNumeroConta,
+            Editor(
+              controlador: _controllerNumeroConta,
               rotulo: 'Número da conta',
-              dica: 'xxxx-x',),
-            Editor(controlador: _controllerCampoValor,
+              dica: 'xxxx-x',
+            ),
+            Editor(
+                controlador: _controllerCampoValor,
                 rotulo: 'Valor',
                 dica: '100,00',
                 icone: Icons.monetization_on),
             RaisedButton(
-                child: const Text('Confirmar'),
-                onPressed: () => _criaTransferencia(),
+              child: const Text('Confirmar'),
+              onPressed: () => _criaTransferencia(context),
             )
           ],
         ));
   }
 
-  void _criaTransferencia() {
-    final double? valor =
-    double.tryParse(_controllerCampoValor.text);
+  void _criaTransferencia(BuildContext context) {
+    final double? valor = double.tryParse(_controllerCampoValor.text);
     final int? conta = int.tryParse(_controllerNumeroConta.text);
     if (valor != null && conta != null) {
       final transferenciaCriada = Transferencia(valor, conta);
-      debugPrint('$transferenciaCriada');
+      debugPrint('Criando transferência');
+      Navigator.pop(context, transferenciaCriada);
     }
   }
 }
@@ -69,8 +72,8 @@ class Editor extends StatelessWidget {
       child: TextField(
         controller: controlador, //Funciona como um ID.
         style: const TextStyle(fontSize: 24.0),
-        decoration:
-        InputDecoration(icon: icone != null ? Icon(icone) : null,
+        decoration: InputDecoration(
+            icon: icone != null ? Icon(icone) : null,
             labelText: rotulo,
             hintText: dica),
         keyboardType: TextInputType.number,
@@ -95,7 +98,16 @@ class ListaTransferencia extends StatelessWidget {
         ],
       ),
       floatingActionButton:
-      FloatingActionButton(onPressed: () {}, child: const Icon(Icons.add)),
+      FloatingActionButton(onPressed: () {
+        final Future<Transferencia?> future = Navigator.push(context, MaterialPageRoute(builder: (context) {
+          return FormularioTransferencia();
+        }));
+        future.then((transferenciaRecebida){
+          debugPrint('Chegou no then');
+          debugPrint('$transferenciaRecebida');
+        });
+      }, child: const Icon(Icons.add)),
+
       appBar: AppBar(
         title: const Text('Transferências'),
       ),
