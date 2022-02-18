@@ -28,43 +28,54 @@ class FormularioTransferencia extends StatelessWidget {
         ),
         body: Column(
           children: <Widget>[
-            Padding(
-              padding: EdgeInsets.all(16.0), //Você consegue deixar a seu gosto.
-              child: TextField(
-                controller: _controllerNumeroConta, //Funciona como um ID.
-                style: TextStyle(fontSize: 24.0),
-                decoration: const InputDecoration(
-                    labelText: 'Número da conta', hintText: '0000-0'),
-                keyboardType: TextInputType.number,
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.all(16.0), //Você consegue deixar a seu gosto.
-              child: TextField(
-                controller: _controllerCampoValor,
-                style: TextStyle(fontSize: 24.0),
-                decoration: const InputDecoration(
-                    icon: Icon(Icons.monetization_on),
-                    labelText: 'Valor',
-                    hintText: '0,00'),
-                keyboardType: TextInputType.number,
-              ),
-            ),
+            Editor(controlador: _controllerNumeroConta,
+              rotulo: 'Número da conta',
+              dica: 'xxxx-x',),
+            Editor(controlador: _controllerCampoValor,
+                rotulo: 'Valor',
+                dica: '100,00',
+                icone: Icons.monetization_on),
             RaisedButton(
-              child: const Text('Confirmar'),
-              onPressed: () {
-                debugPrint('Clickou no confirmar');
-                final double? valor =
-                    double.tryParse(_controllerCampoValor.text);
-                final int? conta = int.tryParse(_controllerNumeroConta.text);
-                if (valor != null && conta != null) {
-                  final transferenciaCriada = Transferencia(valor, conta);
-                  debugPrint('$transferenciaCriada');
-                }
-              },
+                child: const Text('Confirmar'),
+                onPressed: () => _criaTransferencia(),
             )
           ],
         ));
+  }
+
+  void _criaTransferencia() {
+    final double? valor =
+    double.tryParse(_controllerCampoValor.text);
+    final int? conta = int.tryParse(_controllerNumeroConta.text);
+    if (valor != null && conta != null) {
+      final transferenciaCriada = Transferencia(valor, conta);
+      debugPrint('$transferenciaCriada');
+    }
+  }
+}
+
+class Editor extends StatelessWidget {
+  final TextEditingController? controlador;
+  final String? rotulo;
+  final String? dica;
+  final IconData? icone;
+
+  Editor({this.controlador, this.rotulo, this.dica, this.icone});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(16.0), //Você consegue deixar a seu gosto.
+      child: TextField(
+        controller: controlador, //Funciona como um ID.
+        style: const TextStyle(fontSize: 24.0),
+        decoration:
+        InputDecoration(icon: icone != null ? Icon(icone) : null,
+            labelText: rotulo,
+            hintText: dica),
+        keyboardType: TextInputType.number,
+      ),
+    );
   }
 }
 
@@ -84,7 +95,7 @@ class ListaTransferencia extends StatelessWidget {
         ],
       ),
       floatingActionButton:
-          FloatingActionButton(onPressed: () {}, child: const Icon(Icons.add)),
+      FloatingActionButton(onPressed: () {}, child: const Icon(Icons.add)),
       appBar: AppBar(
         title: const Text('Transferências'),
       ),
@@ -101,10 +112,10 @@ class ItemTransferencia extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
         child: ListTile(
-      leading: const Icon(Icons.monetization_on),
-      title: Text(_transferencia.valor.toString()),
-      subtitle: Text(_transferencia.numeroConta.toString()),
-    ));
+          leading: const Icon(Icons.monetization_on),
+          title: Text(_transferencia.valor.toString()),
+          subtitle: Text(_transferencia.numeroConta.toString()),
+        ));
   }
 }
 
